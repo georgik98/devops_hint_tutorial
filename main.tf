@@ -1,4 +1,5 @@
 provider "aws" {
+  alias = "eu"
   region = "eu-central-1"
 }
 
@@ -120,29 +121,29 @@ resource "aws_security_group" "allow_http" {
 }
 
 resource "aws_instance" "server" {
-  count                       = 1
-  ami                         = "ami-0faab6bdbac9486fb"
-  instance_type               = "t2.micro"
+  count                       = var.instance_count
+  ami                         = var.ami
+  instance_type               = var.instance_type
   key_name                    = aws_key_pair.aws_key.key_name
   associate_public_ip_address = true
   subnet_id                   = aws_subnet.dev-public-1.id
   vpc_security_group_ids      = [aws_security_group.allow_ssh.id, aws_security_group.allow_http.id]
 
   tags = {
-    Name = "tf-server-1"
+    Name = element(var.instance_tags, count.index)
   }
 }
 
-resource "aws_instance" "server-2" {
-  count                       = 1
-  ami                         = "ami-0faab6bdbac9486fb"
-  instance_type               = "t2.micro"
+resource "aws_instance" "server-1" {
+  count                       = var.instance_count
+  ami                         = var.ami
+  instance_type               = var.instance_type
   key_name                    = aws_key_pair.aws_key.key_name
   associate_public_ip_address = true
   subnet_id                   = aws_subnet.dev-public-2.id
   vpc_security_group_ids      = [aws_security_group.allow_ssh.id, aws_security_group.allow_http.id]
 
   tags = {
-    Name = "tf-server-2"
+    Name = element(var.instance_tags, count.index)
   }
 }
